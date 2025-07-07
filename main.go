@@ -6,19 +6,6 @@ import (
 	"time"
 )
 
-func daySuffix(day int) string {
-	switch day {
-	case 1, 21, 31:
-		return "st"
-	case 2, 22:
-		return "nd"
-	case 3, 23:
-		return "rd"
-	default:
-		return "th"
-	}
-}
-
 func main() {
 	t := time.Now()
 	day := t.Day()
@@ -31,7 +18,7 @@ func main() {
 	formatted := fmt.Sprintf("%s %d%s %d:%02d%s",
 		t.Format("Jan"),
 		day,
-		daySuffix(day),
+		DaySuffix(day),
 		hour,
 		t.Minute(),
 		t.Format("PM"))
