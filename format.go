@@ -162,7 +162,7 @@ func YearToWords(year int, long bool) string {
 		result += " "
 		if long && remainder < 10 {
 			result += "and "
-		} else if remainder < 10 && year >= 1100 && year < 2000 {
+		} else if remainder < 10 && year >= 1970 && year < 2000 {
 			result += "O' "
 		}
 		result += NumberToWords(remainder)
