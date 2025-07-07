@@ -147,7 +147,7 @@ func YearToWords(year int, long bool) string {
 		}
 	} else {
 		// Handle 2000-9999
-		if long || (hundreds == 0 && remainder < 10) {
+		if long {
 			result = ones[thousands] + " Thousand"
 			if hundreds != 0 {
 				result += " " + NumberToWords(hundreds) + " Hundred"
@@ -160,13 +160,19 @@ func YearToWords(year int, long bool) string {
 	// Append remainder if non-zero
 	if remainder != 0 {
 		result += " "
-		if long && remainder < 10 {
-			result += "and "
-		} else if remainder < 10 && year >= 1970 && year < 2000 {
-			result += "O' "
+		if long {
+			result += "and " + NumberToWords(remainder)
+		} else if year >= 2000 {
+			// For short form, use "O'" for single-digit remainders, no "O'" for two-digit
+			if remainder < 10 {
+				result += "O'" + ones[remainder]
+			} else {
+				result += NumberToWords(remainder)
+			}
+		} else {
+			result += NumberToWords(remainder)
 		}
-		result += NumberToWords(remainder)
 	}
 
-	return result
+	return strings.TrimSpace(result)
 }
