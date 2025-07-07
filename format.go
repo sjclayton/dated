@@ -1,42 +1,68 @@
 package main
 
-var ones = []string{"", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine"}
+import "strings"
 
-var teens = []string{"Ten", "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen", "Seventeen", "Eighteen", "Nineteen"}
+// Lookup tables
+var (
+	ones         = []string{"", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine"}
+	ordinalOnes  = []string{"", "First", "Second", "Third", "Fourth", "Fifth", "Sixth", "Seventh", "Eighth", "Ninth"}
+	teens        = []string{"Ten", "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen", "Seventeen", "Eighteen", "Nineteen"}
+	ordinalTeens = []string{"Tenth", "Eleventh", "Twelfth", "Thirteenth", "Fourteenth", "Fifteenth", "Sixteenth", "Seventeenth", "Eighteenth", "Nineteenth"}
+	tens         = []string{"", "", "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety"}
+	ordinalTens  = []string{"", "", "Twentieth", "Thirtieth", "Fortieth", "Fiftieth", "Sixtieth", "Seventieth", "Eightieth", "Ninetieth"}
+	scales       = []string{"", "Thousand", "Million", "Billion", "Trillion"}
+)
 
-var tens = []string{"", "", "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety"}
+func NumberSuffix(n int) string {
+	lastTwoDigits := n % 100
+	lastDigit := n % 10
 
-var ordinalOnes = []string{"", "First", "Second", "Third", "Fourth", "Fifth", "Sixth", "Seventh", "Eighth", "Ninth"}
+	// Numbers ending in 11, 12, 13 always get "th"
+	if lastTwoDigits == 11 || lastTwoDigits == 12 || lastTwoDigits == 13 {
+		return "th"
+	}
 
-var ordinalTeens = []string{"Tenth", "Eleventh", "Twelfth", "Thirteenth", "Fourteenth", "Fifteenth", "Sixteenth", "Seventeenth", "Eighteenth", "Nineteenth"}
-
-var ordinalTens = []string{"", "", "Twentieth", "Thirtieth", "Fortieth", "Fiftieth", "Sixtieth", "Seventieth", "Eightieth", "Ninetieth"}
-
-func DaySuffix(day int) string {
-	switch day {
-	case 1, 21, 31:
+	// Apply suffix based on last digit
+	switch lastDigit {
+	case 1:
 		return "st"
-	case 2, 22:
+	case 2:
 		return "nd"
-	case 3, 23:
+	case 3:
 		return "rd"
 	default:
 		return "th"
 	}
 }
 
-func NumberToWords(n int, suffix bool) string {
+func NumberToWords(n int, suffix ...bool) string {
+	wantSuffix := false
+	if len(suffix) > 0 {
+		wantSuffix = suffix[0]
+	}
+
+	// Handle zero
 	if n == 0 {
+		if wantSuffix {
+			return "Zeroth"
+		}
 		return "Zero"
 	}
+
+	// Handle negative numbers
+	if n < 0 {
+		return "Negative " + NumberToWords(-n)
+	}
+
+	// Handle numbers up to 99
 	if n < 10 {
-		if suffix {
+		if wantSuffix {
 			return ordinalOnes[n]
 		}
 		return ones[n]
 	}
 	if n < 20 {
-		if suffix {
+		if wantSuffix {
 			return ordinalTeens[n-10]
 		}
 		return teens[n-10]
@@ -45,46 +71,60 @@ func NumberToWords(n int, suffix bool) string {
 		tensDigit := n / 10
 		onesDigit := n % 10
 		if onesDigit == 0 {
-			if suffix {
+			if wantSuffix {
 				return ordinalTens[tensDigit]
 			}
 			return tens[tensDigit]
 		}
 		separator := "-"
-		if suffix {
+		if wantSuffix {
 			return tens[tensDigit] + separator + ordinalOnes[onesDigit]
 		}
 		return tens[tensDigit] + separator + ones[onesDigit]
 	}
+
+	// Handle numbers up to 999 (explicit hundreds)
 	if n < 1000 {
-		hundreds := n / 100
+		hundredsDigit := n / 100
 		remainder := n % 100
-		base := ones[hundreds] + " Hundred"
-		if suffix && remainder == 0 {
-			return base + "th"
-		}
+		base := ones[hundredsDigit] + " Hundred"
 		if remainder == 0 {
+			if wantSuffix {
+				return base + "th"
+			}
 			return base
 		}
-		return base + " " + NumberToWords(remainder, suffix)
-	}
-	if n >= 1000 {
-		thousands := n / 1000
-		remainder := n % 1000
-		base := ones[thousands] + " Thousand"
-		if suffix && remainder == 0 {
-			return base + "th"
+		if wantSuffix {
+			return base + " " + NumberToWords(remainder, true)
 		}
-		if remainder == 0 {
-			return base
-		}
-		return base + " " + NumberToWords(remainder, suffix)
+		return base + " " + NumberToWords(remainder)
 	}
-	return ""
+
+	// Handle larger numbers
+	result := ""
+	num := n
+	scaleIndex := 0
+
+	for num > 0 && scaleIndex < len(scales) {
+		chunk := num % 1000
+		if chunk > 0 {
+			isLastChunk := num < 1000
+			chunkStr := NumberToWords(chunk, wantSuffix && !isLastChunk)
+			if result != "" {
+				result = chunkStr + " " + scales[scaleIndex] + " " + result
+			} else {
+				result = chunkStr + " " + scales[scaleIndex]
+			}
+		}
+		num /= 1000
+		scaleIndex++
+	}
+
+	return strings.TrimSpace(result)
 }
 
 func YearToWords(year int, long bool) string {
-	if year < 1000 || year > 9999 {
+	if year < 1970 || year > 9999 {
 		return "Year out of range"
 	}
 
@@ -98,26 +138,22 @@ func YearToWords(year int, long bool) string {
 		return ones[thousands] + " Thousand"
 	}
 
-	// Handle 1000-1999
+	// Handle 1970-1999
 	if year < 2000 {
-		if year < 1100 {
-			result = "One Thousand"
+		if long {
+			result = NumberToWords(year/100) + " Hundred"
 		} else {
-			if long {
-				result = NumberToWords(year/100, false) + " Hundred"
-			} else {
-				result = NumberToWords(year/100, false)
-			}
+			result = NumberToWords(year / 100)
 		}
 	} else {
 		// Handle 2000-9999
 		if long || (hundreds == 0 && remainder < 10) {
 			result = ones[thousands] + " Thousand"
 			if hundreds != 0 {
-				result += " " + NumberToWords(hundreds, false) + " Hundred"
+				result += " " + NumberToWords(hundreds) + " Hundred"
 			}
 		} else {
-			result = NumberToWords(year/100, false)
+			result = NumberToWords(year / 100)
 		}
 	}
 
@@ -129,7 +165,7 @@ func YearToWords(year int, long bool) string {
 		} else if remainder < 10 && year >= 1100 && year < 2000 {
 			result += "O' "
 		}
-		result += NumberToWords(remainder, false)
+		result += NumberToWords(remainder)
 	}
 
 	return result

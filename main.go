@@ -18,7 +18,7 @@ func main() {
 	formatted := fmt.Sprintf("%s %d%s %d:%02d%s",
 		t.Format("Jan"),
 		day,
-		DaySuffix(day),
+		NumberSuffix(day),
 		hour,
 		t.Minute(),
 		t.Format("PM"))
