@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"fmt"
-	"strings"
 	"time"
 
 	"github.com/spf13/cobra"
@@ -26,6 +25,7 @@ var nowCmd = &cobra.Command{
 		} else if hour > 12 {
 			hour -= 12 // Afternoon
 		}
+
 		output := fmt.Sprintf("%s %d%s %d:%02d%s",
 			now.Format("Jan"),
 			day,
@@ -34,12 +34,7 @@ var nowCmd = &cobra.Command{
 			now.Minute(),
 			now.Format("PM"))
 
-		switch outputCase {
-		case "upper":
-			output = strings.ToUpper(output)
-		case "lower":
-			output = strings.ToLower(output)
-		}
+		output = format.TransformCase(output, outputCase)
 		fmt.Println(output)
 	},
 }

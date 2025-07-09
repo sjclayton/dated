@@ -8,10 +8,14 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var outputCase string
+var (
+	outputCase string
+	suffix     bool
+	words      bool
+)
 
 func init() {
-	RootCmd.PersistentFlags().StringVarP(&outputCase, "case", "c", "", "Set output case: lower or upper")
+	RootCmd.PersistentFlags().StringVarP(&outputCase, "case", "c", "", "Set output case: u/upper, l/lower")
 }
 
 var RootCmd = &cobra.Command{

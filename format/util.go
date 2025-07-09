@@ -123,3 +123,14 @@ func NumberToWords(n int, suffix ...bool) string {
 
 	return strings.TrimSpace(result)
 }
+
+func TransformCase(output, outputCase string) string {
+	switch outputCase {
+	case "u", "upper":
+		return strings.ToUpper(output)
+	case "l", "lower":
+		return strings.ToLower(output)
+	default:
+		return output
+	}
+}

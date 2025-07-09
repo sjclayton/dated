@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"fmt"
-	"strings"
 	"time"
 
 	"github.com/spf13/cobra"
@@ -22,14 +21,10 @@ var wordsCmd = &cobra.Command{
 		month := now.Format("January")
 		day := format.NumberToWords(now.Day(), true)
 		year := format.YearToWords(now.Year())
-		output := fmt.Sprintf("%s %s, %s", month, day, year)
 
-		switch outputCase {
-		case "upper":
-			output = strings.ToUpper(output)
-		case "lower":
-			output = strings.ToLower(output)
-		}
+		output := fmt.Sprintf("%s %s, %s", month, day, year)
+		output = format.TransformCase(output, outputCase)
+
 		fmt.Println(output)
 	},
 }
