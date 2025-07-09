@@ -1,4 +1,4 @@
-package main
+package format
 
 import "strings"
 
@@ -124,7 +124,6 @@ func NumberToWords(n int, suffix ...bool) string {
 }
 
 func MilitaryTimeToWords(hours, minutes int) string {
-	// Validate ranges
 	if hours < 0 || hours > 23 || minutes < 0 || minutes > 59 {
 		return "Time out of range"
 	}
@@ -157,10 +156,15 @@ func MilitaryTimeToWords(hours, minutes int) string {
 		}
 	}
 
-	return result
+	return strings.TrimSpace(result)
 }
 
-func YearToWords(year int, long bool) string {
+func YearToWords(year int, long ...bool) string {
+	wantLong := false
+	if len(long) > 0 {
+		wantLong = long[0]
+	}
+
 	if year < 1970 || year > 9999 {
 		return "Year out of range"
 	}
@@ -177,14 +181,14 @@ func YearToWords(year int, long bool) string {
 
 	// Handle 1970-1999
 	if year < 2000 {
-		if long {
+		if wantLong {
 			result = NumberToWords(year/100) + " Hundred"
 		} else {
 			result = NumberToWords(year / 100)
 		}
 	} else {
 		// Handle 2000-9999
-		if long {
+		if wantLong {
 			result = ones[thousands] + " Thousand"
 			if hundreds != 0 {
 				result += " " + NumberToWords(hundreds) + " Hundred"
@@ -197,10 +201,10 @@ func YearToWords(year int, long bool) string {
 	// Append remainder if non-zero
 	if remainder != 0 {
 		result += " "
-		if long {
+		if wantLong {
 			result += "and " + NumberToWords(remainder)
 		} else if year >= 2000 {
-			// For short form, use "O'" for single-digit remainders, no "O'" for two-digit
+			// For short form, use "O'" for single-digit remainders
 			if remainder < 10 {
 				result += "O'" + ones[remainder]
 			} else {
