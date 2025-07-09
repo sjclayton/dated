@@ -8,21 +8,30 @@ GOFLAGS=-ldflags="-s -w"
 # Default target
 all: build
 
-# Build the binary, ensure clean runs first
-build: clean
+# Build the binary
+build:
+	@echo "Building $(BINARY_NAME)..."
 	@mkdir -p $(OUTPUT_DIR)
-	$(GO) build $(GOFLAGS) -o $(OUTPUT_DIR)/$(BINARY_NAME) $(SRC_DIR)
+	@$(GO) build $(GOFLAGS) -o $(OUTPUT_DIR)/$(BINARY_NAME) $(SRC_DIR)
+	@echo "Built successfully in $(OUTPUT_DIR)/"
 
 # Clean the output directory
 clean:
-	rm -rf $(OUTPUT_DIR)
+	@echo "Cleaning up..."
+	@rm -rf $(OUTPUT_DIR)
+	@echo "Done cleaning."
 
-# Run the application
+# Run the application (with optional args)
 run: build
-	./$(OUTPUT_DIR)/$(BINARY_NAME)
+	@echo "Running $(BINARY_NAME) with args: $(filter-out run,$(MAKECMDGOALS))\n"
+	@./$(OUTPUT_DIR)/$(BINARY_NAME) $(filter-out run,$(MAKECMDGOALS))
 
-# Test the project
+# Run all tests
 test:
-	$(GO) test ./...
+	@echo "Running tests..."
+	@$(GO) test -v ./...
+
+%:
+	@:
 
 .PHONY: all build clean run test
