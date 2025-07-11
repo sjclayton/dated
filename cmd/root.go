@@ -1,4 +1,4 @@
-// Package cmd provides the all cmds valid for the application.
+// Package cmd provides the all commands valid for the application.
 package cmd
 
 import (
@@ -21,9 +21,8 @@ func init() {
 var RootCmd = &cobra.Command{
 	Use:   "dated",
 	Short: "A simple CLI tool to output dates (and times) in various formats.",
-	// Long:  `This application provides the ability to format date (and time) output in various ways.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		// Only run the default if no subcommand or flags like -h/--help are present
+		// Only run the default command if no subcommand or flags like -h/--help are present
 		if len(args) == 0 && !cmd.Flags().Changed("help") {
 			nowCmd.Run(cmd, args)
 		}
