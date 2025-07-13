@@ -11,6 +11,8 @@ import (
 
 func init() {
 	RootCmd.AddCommand(nowCmd)
+
+	flagsBase(nowCmd)
 }
 
 var nowCmd = &cobra.Command{
@@ -18,21 +20,13 @@ var nowCmd = &cobra.Command{
 	Short: "Prints the current date and time nicely formatted (default)",
 	Run: func(cmd *cobra.Command, args []string) {
 		now := time.Now()
-		day := now.Day()
-		hour := now.Hour()
-		if hour == 0 {
-			hour = 12 // Midnight
-		} else if hour > 12 {
-			hour -= 12 // Afternoon
-		}
 
-		output := fmt.Sprintf("%s %d%s %d:%02d%s",
+		output := fmt.Sprintf("%s %d%s %s",
 			now.Format("Jan"),
-			day,
-			format.NumberSuffix(day),
-			hour,
-			now.Minute(),
-			now.Format("PM"))
+			now.Day(),
+			format.NumberSuffix(now.Day()),
+			format.ClockFormat(now, clockFormat),
+		)
 
 		output = format.TransformCase(output, outputCase)
 		fmt.Println(output)
