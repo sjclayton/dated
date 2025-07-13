@@ -15,8 +15,8 @@ var formatString string
 
 func init() {
 	RootCmd.AddCommand(customCmd)
+	sharedFlagsBase(customCmd)
 
-	defineSharedFlags(customCmd)
 	// Define format flag with default value
 	customCmd.Flags().StringVarP(&formatString, "format", "f", "<DW> the <D> of <M>, <Y> at <T>", "Custom format string")
 }
@@ -26,13 +26,13 @@ var customCmd = &cobra.Command{
 	Short: "Prints a custom formatted output string",
 	Run: func(cmd *cobra.Command, args []string) {
 		now := time.Now()
-		output := formatCustom(now, formatString, suffix, words)
+		output := formatCustom(now, formatString, shortWkDay, shortMonth, suffix, words)
 		fmt.Println(format.TransformCase(output, outputCase))
 	},
 }
 
 // formatCustom generates a formatted string based on the provided tags.
-func formatCustom(t time.Time, formatStr string, useSuffix, useWords bool) string {
+func formatCustom(t time.Time, formatStr string, shortWkDay, shortMonth, useSuffix, useWords bool) string {
 	// Map placeholders to time formats
 	replacements := map[string]string{
 		"<DW>": t.Format("Monday"),
@@ -43,14 +43,23 @@ func formatCustom(t time.Time, formatStr string, useSuffix, useWords bool) strin
 		"<DY>": strconv.Itoa(t.YearDay()),
 	}
 
-	if useSuffix && useWords {
+	if shortWkDay {
+		replacements["<DW>"] = t.Format("Mon")
+	}
+
+	if shortMonth {
+		replacements["<M>"] = t.Format("Jan")
+	}
+
+	switch {
+	case useSuffix && useWords:
 		replacements["<D>"] = format.NumberToWords(t.Day(), true)
 		replacements["<DY>"] = format.NumberToWords(t.YearDay(), true)
 		replacements["<Y>"] = format.YearToWords(t.Year(), false)
-	} else if useSuffix {
+	case useSuffix:
 		replacements["<D>"] = fmt.Sprintf("%d%s", t.Day(), format.NumberSuffix(t.Day()))
 		replacements["<DY>"] = fmt.Sprintf("%d%s", t.YearDay(), format.NumberSuffix(t.YearDay()))
-	} else if useWords {
+	case useWords:
 		replacements["<D>"] = format.NumberToWords(t.Day(), false)
 		replacements["<DY>"] = format.NumberToWords(t.YearDay(), false)
 		replacements["<Y>"] = format.YearToWords(t.Year(), false)
