@@ -8,16 +8,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var (
-	outputCase string
-	suffix     bool
-	raw        bool
-)
+var outputCase string
 
 func init() {
 	RootCmd.PersistentFlags().StringVarP(&outputCase, "case", "c", "", "Set output case: u/upper, l/lower")
-	RootCmd.PersistentFlags().BoolVarP(&raw, "raw", "o", false, "Output in raw format (no newlines) <default: false>")
-	RootCmd.PersistentFlags().BoolVarP(&suffix, "suffix", "s", false, "Use ordinal suffix for dates (1st / 2nd / First / Second) <default: false>")
 }
 
 var RootCmd = &cobra.Command{
