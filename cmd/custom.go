@@ -20,7 +20,7 @@ func init() {
 	flagsCustomFmt(customCmd)
 
 	// Define format flag with default value
-	customCmd.Flags().StringVarP(&formatString, "format", "f", "<DW> <M> <D>, <Y> @ <T>", "Custom format string")
+	customCmd.Flags().StringVarP(&formatString, "format", "f", "<DW> <M> <D> <Y> @ <T>", "Custom format string")
 }
 
 var customCmd = &cobra.Command{

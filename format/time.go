@@ -8,7 +8,7 @@ import (
 func ClockFormat(t time.Time, clockFormat bool) string {
 	switch clockFormat {
 	case true:
-		return t.Format("15:15")
+		return t.Format("15:04")
 	default:
 		return t.Format("3:04PM")
 	}
