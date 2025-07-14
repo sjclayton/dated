@@ -20,7 +20,7 @@ func init() {
 
 var longCmd = &cobra.Command{
 	Use:   "long",
-	Short: "Prints the date in long format (e.g., 'January 15') with optional flags",
+	Short: "Prints the date in long format ('January 15') with optional flags",
 	Run: func(cmd *cobra.Command, args []string) {
 		now := time.Now()
 		month := now.Format("January")

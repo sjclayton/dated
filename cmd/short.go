@@ -18,7 +18,7 @@ func init() {
 
 var shortCmd = &cobra.Command{
 	Use:   "short",
-	Short: "Prints the date in short format (e.g., '01/30') with optional flags",
+	Short: "Prints the date in short format ('01/30') with optional flags",
 	Run: func(cmd *cobra.Command, args []string) {
 		now := time.Now()
 		month := fmt.Sprintf("%02d", int(now.Month()))

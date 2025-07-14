@@ -15,7 +15,8 @@ func YearToWords(year int, long ...bool) string {
 	thousands := year / 1000
 	hundreds := (year % 1000) / 100
 	remainder := year % 100
-	result := ""
+
+	var result string
 
 	// Handle even thousands (2000, 3000, etc.)
 	if year%1000 == 0 {

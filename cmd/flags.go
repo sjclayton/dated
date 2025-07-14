@@ -28,7 +28,7 @@ func flagsCustomFmt(cmd *cobra.Command) {
 	cmd.Flags().BoolVarP(&shortMonth, "short-month", "M", false, "Use short month (Jan / Feb / Mar)")
 	cmd.Flags().BoolVarP(&shortYear, "short-year", "Y", false, "Use short year ('25 / Twenty Twenty-Five)")
 	cmd.Flags().BoolVarP(&suffix, "suffix", "s", false, "Use ordinal suffix for dates (1st / 2nd / First / Second)")
-	cmd.Flags().BoolVarP(&words, "words", "W", false, "Output words (example: 'Seven Fifteen' instead of '07:15', or 'January Thirtieth' instead of '01-30')")
+	cmd.Flags().BoolVarP(&words, "words", "W", false, "Output words (e.g. 'Seven Fifteen' instead of '7:15', or 'January Thirtieth' instead of '01/30')")
 }
 
 // Shared flags usable by customizable presets
