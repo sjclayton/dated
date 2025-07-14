@@ -1,7 +1,9 @@
 // Package format provides formatting functions used by the application.
 package format
 
-import "strings"
+import (
+	"strings"
+)
 
 // Lookup tables
 var (
@@ -14,6 +16,7 @@ var (
 	scales       = []string{"", "Thousand", "Million", "Billion", "Trillion"}
 )
 
+// NumberSuffix returns a string representation of the ordinal suffix (e.g., "st", "nd", "rd", "th") for a given integer.
 func NumberSuffix(n int) string {
 	lastTwoDigits := n % 100
 	lastDigit := n % 10
@@ -36,13 +39,17 @@ func NumberSuffix(n int) string {
 	}
 }
 
+// NumberToWords converts a number to its word representation.
+// If suffix (optional) is true, an ordinal suffix (e.g., "th", "st", "nd", "rd") is appended to the output.
+//
+// For example, NumberToWords(10) returns "Ten" and NumberToWords(10, true) returns "Tenth".
 func NumberToWords(n int, suffix ...bool) string {
 	wantSuffix := false
 	if len(suffix) > 0 {
 		wantSuffix = suffix[0]
 	}
 
-	// Handle zero
+	// Handle numbers < 1000, including negative numbers and zero
 	if n == 0 {
 		if wantSuffix {
 			return "Zeroth"
@@ -50,24 +57,24 @@ func NumberToWords(n int, suffix ...bool) string {
 		return "Zero"
 	}
 
-	// Handle negative numbers
 	if n < 0 {
-		return "Negative " + NumberToWords(-n)
+		return "Negative " + NumberToWords(-n, wantSuffix)
 	}
 
-	// Handle numbers up to 99
 	if n < 10 {
 		if wantSuffix {
 			return ordinalOnes[n]
 		}
 		return ones[n]
 	}
+
 	if n < 20 {
 		if wantSuffix {
 			return ordinalTeens[n-10]
 		}
 		return teens[n-10]
 	}
+
 	if n < 100 {
 		tensDigit := n / 10
 		onesDigit := n % 10
@@ -84,7 +91,6 @@ func NumberToWords(n int, suffix ...bool) string {
 		return tens[tensDigit] + separator + ones[onesDigit]
 	}
 
-	// Handle numbers up to 999 (explicit hundreds)
 	if n < 1000 {
 		hundredsDigit := n / 100
 		remainder := n % 100
@@ -95,35 +101,36 @@ func NumberToWords(n int, suffix ...bool) string {
 			}
 			return base
 		}
-		if wantSuffix {
-			return base + " " + NumberToWords(remainder, true)
-		}
-		return base + " " + NumberToWords(remainder)
+		return base + " " + NumberToWords(remainder, wantSuffix)
 	}
 
 	// Handle larger numbers
-	result := ""
-	num := n
-	scaleIndex := 0
+	var result string
+	var scaleIndex int
 
-	for num > 0 && scaleIndex < len(scales) {
-		chunk := num % 1000
+	for n > 0 && scaleIndex < len(scales) {
+		chunk := n % 1000
 		if chunk > 0 {
-			isLastChunk := num < 1000
-			chunkStr := NumberToWords(chunk, wantSuffix && !isLastChunk)
+			chunkStr := NumberToWords(chunk, false)
+			scale := scales[scaleIndex]
 			if result != "" {
-				result = chunkStr + " " + scales[scaleIndex] + " " + result
+				result = chunkStr + " " + scale + " " + result
 			} else {
-				result = chunkStr + " " + scales[scaleIndex]
+				result = chunkStr + " " + scale
 			}
 		}
-		num /= 1000
+		n /= 1000
 		scaleIndex++
+	}
+
+	if wantSuffix {
+		result = strings.TrimSpace(result) + NumberSuffix(n)
 	}
 
 	return strings.TrimSpace(result)
 }
 
+// TransformCase transforms the case of the output string if the case flag is passed with a valid option.
 func TransformCase(output, outputCase string) string {
 	switch outputCase {
 	case "u", "upper":
